@@ -21,8 +21,11 @@ export const SIZES = {
 };
 
 export const TEXT = {
-  retry: 'Повторить попытку',
-  next: 'Далее',
-  offline: 'Нет подключения к интернету',
-  reload: 'Перезагрузить'
+  retry: 'Try again',
+  next: 'Next',
+  offline: 'No internet connection',
+  reload: 'Reload',
+  error: 'ERROR OCCURED',
+  success: 'Success',
+  fail: 'Fail'
 };

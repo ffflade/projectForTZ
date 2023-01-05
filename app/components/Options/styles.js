@@ -10,7 +10,7 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 20,
-    marginVertical: 10
+    marginVertical: 5
   },
   optionText: {
     fontSize: 20,

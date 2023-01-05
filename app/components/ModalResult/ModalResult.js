@@ -8,7 +8,7 @@ export const ModalResult = ({ showScoreModal, score, allQuestions, restartQuiz }
     <Modal animationType="slide" transparent={true} visible={showScoreModal}>
       <View style={styles.overlay}>
         <View style={styles.container}>
-          <Text style={styles.result}>{score > allQuestions.length / 2 ? 'Поздравляем!' : 'Провал!'}</Text>
+          <Text style={styles.result}>{score > allQuestions.length / 2 ? TEXT.success : TEXT.fail}</Text>
 
           <View style={styles.scoreContainer}>
             <Text

@@ -14,6 +14,6 @@ export const styles = StyleSheet.create({
   },
   questionText: {
     color: COLORS.white,
-    fontSize: 28
+    fontSize: 20
   }
 });

@@ -1,33 +1,33 @@
 {
   "project_info": {
-    "project_number": "959913658811",
-    "project_id": "project1-fff90",
-    "storage_bucket": "project1-fff90.appspot.com"
+    "project_number": "1036100416238",
+    "project_id": "retensaa",
+    "storage_bucket": "retensaa.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:959913658811:android:a3c1e2cf8110048ca15c9e",
+        "mobilesdk_app_id": "1:1036100416238:android:3f541f8702ac903e9e79ff",
         "android_client_info": {
-          "package_name": "com.project1"
+          "package_name": "sine.nessine.app"
         }
       },
       "oauth_client": [
         {
-          "client_id": "959913658811-gsfggbgi6vjvlde1a8nc2krr1i49lfot.apps.googleusercontent.com",
+          "client_id": "1036100416238-aqujn6spqt62h8rdmp798onku07hr6ct.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyBjsOS5lFJJX_13CJIavnFm3K2TSLpc3fc"
+          "current_key": "AIzaSyATHAwi32oHG1_RLUvIupahPLT2EvJJvWE"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "959913658811-gsfggbgi6vjvlde1a8nc2krr1i49lfot.apps.googleusercontent.com",
+              "client_id": "1036100416238-aqujn6spqt62h8rdmp798onku07hr6ct.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

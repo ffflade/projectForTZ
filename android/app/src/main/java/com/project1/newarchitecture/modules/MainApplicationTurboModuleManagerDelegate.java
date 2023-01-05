@@ -1,4 +1,4 @@
-package com.project1.newarchitecture.modules;
+package sine.nessine.app.newarchitecture.modules;
 
 import com.facebook.jni.HybridData;
 import com.facebook.react.ReactPackage;

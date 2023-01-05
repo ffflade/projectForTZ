@@ -4,7 +4,7 @@ import remoteConfig from '@react-native-firebase/remote-config';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import DeviceInfo from 'react-native-device-info';
 import CookieManager from '@react-native-cookies/cookies';
-import { BackHandler } from 'react-native';
+import { BackHandler, ScrollView, SafeAreaView, ActivityIndicator } from 'react-native';
 import { WebView } from 'react-native-webview';
 import { styles } from './styles';
 
@@ -15,6 +15,7 @@ const App = () => {
   const [error, setError] = useState(null);
   const [isSavedLink, setIsSavedLink] = useState(false);
   const [isNotValidPhone, setIsNotValidPhone] = useState(false);
+  const [isLoadong, setLoading] = useState(false);
   const [link, setLink] = useState('');
 
   const backAction = () => {
@@ -106,32 +107,7 @@ const App = () => {
   if (isSavedLink) {
     if (isConnected) {
       return (
-        <WebView
-          style={styles.container}
-          originWhiteList={['*']}
-          javaScriptEnabled={true}
-          domStorageEnabled={true}
-          thirdPartyCookiesEnabled
-          sharedCookiesEnabled={true}
-          source={{ uri: link }}
-          ref={webViewRef}
-          onNavigationStateChange={(navState) => {
-            setCanGoBack(navState.canGoBack);
-            navChange;
-          }}
-        />
-      );
-    } else {
-      return <OfflineScreen setIsConnected={setIsConnected} />;
-    }
-  } else {
-    if (isNotValidPhone) {
-      return <Quiz />;
-    } else {
-      if (error) {
-        return <Error error={error} />;
-      } else {
-        return (
+        <>
           <WebView
             style={styles.container}
             originWhiteList={['*']}
@@ -145,7 +121,46 @@ const App = () => {
               setCanGoBack(navState.canGoBack);
               navChange;
             }}
+            onLoadStart={() => setLoading(true)}
+            onLoadEnd={() => setLoading(false)}
           />
+          {isLoadong && <ActivityIndicator color="#234356" size="large" style={styles.loading} />}
+        </>
+      );
+    } else {
+      return <OfflineScreen setIsConnected={setIsConnected} />;
+    }
+  } else {
+    if (isNotValidPhone) {
+      return (
+        <ScrollView style={styles.scrollView}>
+          <Quiz />
+        </ScrollView>
+      );
+    } else {
+      if (error) {
+        return <Error error={error} />;
+      } else {
+        return (
+          <>
+            <WebView
+              style={styles.container}
+              originWhiteList={['*']}
+              javaScriptEnabled={true}
+              domStorageEnabled={true}
+              thirdPartyCookiesEnabled
+              sharedCookiesEnabled={true}
+              source={{ uri: link }}
+              ref={webViewRef}
+              onNavigationStateChange={(navState) => {
+                setCanGoBack(navState.canGoBack);
+                navChange;
+              }}
+              onLoadStart={() => setLoading(true)}
+              onLoadEnd={() => setLoading(false)}
+            />
+            {isLoadong && <ActivityIndicator color="#234356" size="large" style={styles.loading} />}
+          </>
         );
       }
     }

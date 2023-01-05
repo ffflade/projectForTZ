@@ -1,4 +1,4 @@
-package com.project1.newarchitecture;
+package sine.nessine.app.newarchitecture;
 
 import android.app.Application;
 import androidx.annotation.NonNull;
@@ -19,9 +19,9 @@ import com.facebook.react.fabric.CoreComponentsRegistry;
 import com.facebook.react.fabric.FabricJSIModuleProvider;
 import com.facebook.react.fabric.ReactNativeConfig;
 import com.facebook.react.uimanager.ViewManagerRegistry;
-import com.project1.BuildConfig;
-import com.project1.newarchitecture.components.MainComponentsRegistry;
-import com.project1.newarchitecture.modules.MainApplicationTurboModuleManagerDelegate;
+import sine.nessine.app.BuildConfig;
+import sine.nessine.app.newarchitecture.components.MainComponentsRegistry;
+import sine.nessine.app.newarchitecture.modules.MainApplicationTurboModuleManagerDelegate;
 import java.util.ArrayList;
 import java.util.List;
 
