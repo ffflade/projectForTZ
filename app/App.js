@@ -1,32 +1,30 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { Quiz, Error, OfflineScreen } from './screens';
 import remoteConfig from '@react-native-firebase/remote-config';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import DeviceInfo from 'react-native-device-info';
 import CookieManager from '@react-native-cookies/cookies';
-import { BackHandler, ScrollView, SafeAreaView, ActivityIndicator } from 'react-native';
+import { BackHandler, ScrollView, ActivityIndicator } from 'react-native';
 import { WebView } from 'react-native-webview';
 import { styles } from './styles';
 
 const App = () => {
   const webViewRef = useRef(null);
-  const [canGoBack, setCanGoBack] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
   const [error, setError] = useState(null);
   const [isSavedLink, setIsSavedLink] = useState(false);
   const [isNotValidPhone, setIsNotValidPhone] = useState(false);
   const [isLoadong, setLoading] = useState(false);
   const [link, setLink] = useState('');
+  const [canGoBack, setCanGoBack] = useState(false);
+  const [currentUrl, setCurrentUrl] = useState('');
 
-  const backAction = () => {
-    if (canGoBack) {
-      webViewRef.current?.goBack();
-    } else {
-      console.log('cant go back');
+  const handleBack = useCallback(() => {
+    if (canGoBack && webViewRef.current) {
+      webViewRef.current.goBack();
     }
-
     return true;
-  };
+  }, [canGoBack]);
 
   readData = async () => {
     const value = await AsyncStorage.getItem('@url');
@@ -42,7 +40,7 @@ const App = () => {
     remoteConfig().fetch(1000);
     await remoteConfig()
       .setDefaults({
-        url: 'google.com'
+        url: link
       })
       .then(() => remoteConfig().fetchAndActivate());
 
@@ -55,9 +53,9 @@ const App = () => {
     await saveData(url.asString());
   }
 
-  navChange = () => {
+  navChange = (url) => {
     CookieManager.setFromResponse(
-      link,
+      url,
       'user_session=abcdefg; path=/; expires=Thu, 1 Jan 2030 00:00:00 -0000; secure; HttpOnly'
     );
   };
@@ -88,11 +86,15 @@ const App = () => {
   };
 
   useEffect(() => {
-    BackHandler.addEventListener('hardwareBackPress', backAction);
-
     readData();
-    return () => BackHandler.removeEventListener('hardwareBackPress', backAction);
   }, []);
+
+  useEffect(() => {
+    BackHandler.addEventListener('hardwareBackPress', handleBack);
+    return () => {
+      BackHandler.removeEventListener('hardwareBackPress', handleBack);
+    };
+  }, [handleBack]);
 
   useEffect(() => {
     try {
@@ -113,16 +115,24 @@ const App = () => {
             originWhiteList={['*']}
             javaScriptEnabled={true}
             domStorageEnabled={true}
-            thirdPartyCookiesEnabled
+            thirdPartyCookiesEnabled={true}
             sharedCookiesEnabled={true}
             source={{ uri: link }}
             ref={webViewRef}
             onNavigationStateChange={(navState) => {
-              setCanGoBack(navState.canGoBack);
-              navChange;
+              setCurrentUrl(navState.url);
+              navChange(navState.url);
+            }}
+            onLoadProgress={(event) => {
+              if (currentUrl !== link) {
+                setCanGoBack(event.nativeEvent.canGoBack);
+              } else {
+                setCanGoBack(false);
+              }
             }}
             onLoadStart={() => setLoading(true)}
             onLoadEnd={() => setLoading(false)}
+            setSupportMultipleWindows={false}
           />
           {isLoadong && <ActivityIndicator color="#234356" size="large" style={styles.loading} />}
         </>
@@ -148,16 +158,24 @@ const App = () => {
               originWhiteList={['*']}
               javaScriptEnabled={true}
               domStorageEnabled={true}
-              thirdPartyCookiesEnabled
+              thirdPartyCookiesEnabled={true}
               sharedCookiesEnabled={true}
               source={{ uri: link }}
               ref={webViewRef}
               onNavigationStateChange={(navState) => {
-                setCanGoBack(navState.canGoBack);
-                navChange;
+                setCurrentUrl(navState.url);
+                navChange(navState.url);
+              }}
+              onLoadProgress={(event) => {
+                if (currentUrl !== link) {
+                  setCanGoBack(event.nativeEvent.canGoBack);
+                } else {
+                  setCanGoBack(false);
+                }
               }}
               onLoadStart={() => setLoading(true)}
               onLoadEnd={() => setLoading(false)}
+              setSupportMultipleWindows={false}
             />
             {isLoadong && <ActivityIndicator color="#234356" size="large" style={styles.loading} />}
           </>
