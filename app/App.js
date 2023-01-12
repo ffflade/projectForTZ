@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useCallback } from 'react';
+import React, { useEffect, useLayoutEffect, useState, useRef, useCallback } from 'react';
 import { Quiz, Error, OfflineScreen } from './screens';
 import remoteConfig from '@react-native-firebase/remote-config';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -20,15 +20,14 @@ const App = () => {
   const [currentUrl, setCurrentUrl] = useState('');
 
   const handleBack = useCallback(() => {
-    if (canGoBack && webViewRef.current) {
+    if (canGoBack && webViewRef.current && !(currentUrl == link)) {
       webViewRef.current.goBack();
     }
     return true;
-  }, [canGoBack]);
+  }, [canGoBack, link, currentUrl]);
 
   readData = async () => {
     const value = await AsyncStorage.getItem('@url');
-
     if (value === null) {
       setIsSavedLink(false);
     } else {
@@ -37,20 +36,29 @@ const App = () => {
   };
 
   async function remoteConfigOperations() {
-    remoteConfig().fetch(1000);
-    await remoteConfig()
-      .setDefaults({
-        url: link
-      })
-      .then(() => remoteConfig().fetchAndActivate());
+    try {
+      remoteConfig()
+        .fetch(100)
+        .catch((e) => setError(e));
+      await remoteConfig()
+        .setDefaults({
+          url: link
+        })
+        .then(() => remoteConfig().fetchAndActivate())
+        .catch((e) => setError(e));
+    } catch (e) {
+      setError(e);
+    }
 
     const url = remoteConfig().getValue('url');
     checkForPlug(url);
     if (isNotValidPhone) {
       console.log('is not valid phone', isNotValidPhone);
       return;
+    } else {
+      await saveData(url.asString());
+      await AsyncStorage.clear();
     }
-    await saveData(url.asString());
   }
 
   navChange = (url) => {
@@ -85,18 +93,9 @@ const App = () => {
     }
   };
 
-  useEffect(() => {
+  useLayoutEffect(() => {
+    AsyncStorage.clear();
     readData();
-  }, []);
-
-  useEffect(() => {
-    BackHandler.addEventListener('hardwareBackPress', handleBack);
-    return () => {
-      BackHandler.removeEventListener('hardwareBackPress', handleBack);
-    };
-  }, [handleBack]);
-
-  useEffect(() => {
     try {
       if (!isSavedLink) {
         remoteConfigOperations();
@@ -104,7 +103,14 @@ const App = () => {
     } catch (error) {
       setError(error);
     }
-  }, [isSavedLink]);
+  }, [link]);
+
+  useEffect(() => {
+    BackHandler.addEventListener('hardwareBackPress', handleBack);
+    return () => {
+      BackHandler.removeEventListener('hardwareBackPress', handleBack);
+    };
+  }, [handleBack]);
 
   if (isSavedLink) {
     if (isConnected) {
@@ -123,15 +129,17 @@ const App = () => {
               setCurrentUrl(navState.url);
               navChange(navState.url);
             }}
-            onLoadProgress={(event) => {
+            allowFileAccess={true}
+            scalesPageToFit={true}
+            onLoadStart={() => setLoading(true)}
+            onLoadEnd={(event) => {
+              setLoading(false);
               if (currentUrl !== link) {
                 setCanGoBack(event.nativeEvent.canGoBack);
               } else {
                 setCanGoBack(false);
               }
             }}
-            onLoadStart={() => setLoading(true)}
-            onLoadEnd={() => setLoading(false)}
             setSupportMultipleWindows={false}
           />
           {isLoadong && <ActivityIndicator color="#234356" size="large" style={styles.loading} />}
@@ -163,18 +171,24 @@ const App = () => {
               source={{ uri: link }}
               ref={webViewRef}
               onNavigationStateChange={(navState) => {
-                setCurrentUrl(navState.url);
-                navChange(navState.url);
+                try {
+                  setCurrentUrl(navState.url);
+                  navChange(navState.url);
+                } catch (e) {
+                  console.log('ERROR2: ', e);
+                }
               }}
-              onLoadProgress={(event) => {
+              allowFileAccess={true}
+              scalesPageToFit={true}
+              onLoadStart={() => setLoading(true)}
+              onLoadEnd={(event) => {
+                setLoading(false);
                 if (currentUrl !== link) {
                   setCanGoBack(event.nativeEvent.canGoBack);
                 } else {
                   setCanGoBack(false);
                 }
               }}
-              onLoadStart={() => setLoading(true)}
-              onLoadEnd={() => setLoading(false)}
               setSupportMultipleWindows={false}
             />
             {isLoadong && <ActivityIndicator color="#234356" size="large" style={styles.loading} />}

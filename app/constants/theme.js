@@ -25,7 +25,7 @@ export const TEXT = {
   next: 'Next',
   offline: 'No internet connection',
   reload: 'Reload',
-  error: 'ERROR OCCURED',
+  error: 'Internet error ocurred',
   success: 'Success',
   fail: 'Fail'
 };
